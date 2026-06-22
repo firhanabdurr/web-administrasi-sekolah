@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Service Backend Node.js (Bisa di-uncomment nanti kalau udah mau di-dockerize)
+  # backend:
+  #   build: .
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - MONGO_URI=mongodb://mongodb:27017/school_admin?replicaSet=rs0
+  #   depends_on:
+  #     - mongodb
+
+  # Service MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: school_admin_db
+    restart: always
+    ports:
+      - "27017:27017"
+    # Command krusial untuk menyalakan mode Replica Set dengan nama 'rs0'
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo_data:/data/db
+
+  # Service Otomatisasi Inisialisasi Replica Set
+  mongo-init:
+    image: mongo:7.0
+    container_name: school_admin_db_init
+    depends_on:
+      - mongodb
+    restart: "no"
+    # Menunggu 5 detik biar MongoDB siap, lalu otomatis set replica set 'rs0'
+    command: >
+      bash -c "
+        sleep 5
+        mongosh --host mongodb:27017 --eval 'rs.initiate({_id: \"rs0\", members: [{_id: 0, host: \"mongodb:27017\"}]})'
+      "
+
+volumes:
+  mongo_data:
+    name: school_admin_mongo_data
