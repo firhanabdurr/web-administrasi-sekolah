@@ -8,7 +8,6 @@ const helmet = require('helmet'); // Keamanan tambahan untuk HTTP Headers
 const { applyMongoSanitize, apiLimiter, authLimiter } = require('./middlewares/security.middleware');
 const { requireAuth } = require('./middlewares/auth.middleware');
 
-// Import Routers (Asumsi file router sudah dibuat memanggil controller di atas)
 const authRoutes = require('./routes/auth.route');
 const studentRoutes = require('./routes/student.route');
 const transactionRoutes = require('./routes/transaction.route');
